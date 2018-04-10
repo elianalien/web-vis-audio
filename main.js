@@ -6,7 +6,7 @@ notesMelody = '11143313222144225513111444222221';
 time = 0;
 
 // all vars
-var MAX_PARTICLES = 1,
+var MAX_PARTICLES = 5,
 	MAX_LIFE_SPAN = 600,
 	MIN_DENSITY = 15,
 	OFFSET_DENSITY= 15,
@@ -58,14 +58,24 @@ render = e => {
 
 	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
 
-	var part = new Particle();
-	_particles.push(part);
+	if (_particles.length < MAX_PARTICLES){
+		var part = new Particle();
+		_particles.push(part);
 
+		_context.fillStyle = '#fff';
+		_context.fillRect(part.getX(), part.getY(), 5, 5);	
+	}
+	
 	for (var i = 0; i < _particles.length; i++) {
 		_particles[i].update();
+
+		// destroy if in 
+		if (_particles[i].getLifespan()>MAX_LIFE_SPAN){
+			_particles.splice(i,1);
+		}
 	}
 
-	console.log(_particles[_particles.length - 1].getLifespan())
+	console.log('i: ', 0, 'lifespan: ', _particles[0].getLifespan())
 
 }
 
@@ -122,22 +132,7 @@ function Particle() {
 		if (_lifespan % 3 === 0) {
 			_opacity = 1 - _lifespan / MAX_LIFE_SPAN;
 		
-			if (_lifespan >= MAX_LIFE_SPAN){
-				destroy()
-			}
 		}
-	}
-
-	destroy = () => {
-		var particle, i;
-
-		for (i = 0; i < _particles.length; i++) {
-			var particle = _particles[i];
-
-			if (particle === _this) {
-				_particles.splice(i, 1);
-			}	
-		}		
 	}
 
 	this.getOpacity = function() { return _opacity;};
