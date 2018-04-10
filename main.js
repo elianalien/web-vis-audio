@@ -2,6 +2,24 @@
 notesBass   = '10143013202140205013101440202021';
 notesMelody = '11143313222144225513111444222221';
 
+// time init 
+time = 0;
+
+// all vars
+var MAX_PARTICLES = 1,
+	MAX_LIFE_SPAN = 600,
+	MIN_DENSITY = 15,
+	OFFSET_DENSITY= 15,
+	_context,
+	_image,
+	_mouseX,
+	_mouseY,
+	_particles, 
+	_canvasWidth,
+	_canvasHalfWidth,
+	_canvasHeight,
+	_canvasHalfHeight;
+
 // basic oscillator 
 oscSinus = 
 	f => Math.sin(f * time * Math.PI * 2);
@@ -16,24 +34,124 @@ oscNoise =
 	f => Math.random() * 2 -1;
 
 
-image = new Image();
-image.src = 'alphatest.png';
-image.onload = e => {
-	ctx = c.getContext('2d');
-	c.width = width = image.naturalWidth * 2;
-	c.height = height = image.naturalHeight * 2;
-	ctx.drawImage(image, 225, 0);
-
+// draw image 
+// callback to image onload
+_image = new Image();
+_image.src = 'alphatest.png';
+_image.onload = e => {
+	// init Audio Context when Image loaded
 	AC = new AudioContext();
-	SP = AC.createScriptProcessor(2048, 0, 1);
+	// script processor
+	SP = AC.createScriptProcessor(1024, 0, 1); // 1024 buffer = 1024 sample frame
 	SP.connect(AC.destination);
-	SP.onaudioprocess = render;
 
+	SP.onaudioprocess = render
 }
 
 render = e => {
+	console.log('render')
+	// audio Data
 	audioData = e.outputBuffer.getChannelData(0);
+	// print timer on browser's title 
+	time += audioData.length / AC.sampleRate;
+	document.title = time;
+
+	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
+
+	var part = new Particle();
+	_particles.push(part);
+
+	for (var i = 0; i < _particles.length; i++) {
+		_particles[i].update();
+	}
+
+	console.log(_particles[_particles.length - 1].getLifespan())
+
 }
 
+// init function 
+init = f => {
+	console.log('init')
+	// init particle 
+	_particles = [];
 
-time = 0;
+	
+	// init context 
+	_context = c.getContext('2d');
+
+	// init 
+	window.addEventListener('resize', onresize);
+	window.addEventListener('mousemove', onmousemove);
+
+	// on resize function 
+	onresize();
+
+}
+
+onmousemove = e => {
+	_mouseX = e.pageX / innerWidth;
+	_mouseY = e.pageY / innerHeight;
+}
+
+onresize = () => {
+	console.log('onresize')
+	_canvasWidth = c.offsetWidth;
+	_canvasHalfWidth = Math.round(_canvasWidth / 2);
+	_canvasHeight= c.offsetHeight; 
+	_canvasHalfHeight= Math.round(_canvasHeight / 2);
+
+	c.width = _canvasWidth;
+	c.height= _canvasHeight;
+
+
+	console.log('width: ', _canvasWidth, ' height: ', _canvasHeight);
+}
+
+// particles
+function Particle() {
+	var _this = this,
+		_direction = -1 + Math.random() * 10,
+		_posX = Math.random() * _canvasWidth,
+		_posY = Math.random() * _canvasHeight,
+		_lifespan = 0;
+		_opacity = 1;
+
+	update = () => {
+		_lifespan++;
+
+		if (_lifespan % 3 === 0) {
+			_opacity = 1 - _lifespan / MAX_LIFE_SPAN;
+		
+			if (_lifespan >= MAX_LIFE_SPAN){
+				destroy()
+			}
+		}
+	}
+
+	destroy = () => {
+		var particle, i;
+
+		for (i = 0; i < _particles.length; i++) {
+			var particle = _particles[i];
+
+			if (particle === _this) {
+				_particles.splice(i, 1);
+			}	
+		}		
+	}
+
+	this.getOpacity = function() { return _opacity;};
+	this.getX = function() { return _posX;};
+	this.getY = function() { return _posY;};
+	this.getLifespan = function() { return _lifespan};
+	this.update = update;
+}
+
+drawParticle = () => {
+	opacity = _particles[i].getOpacity();
+
+	_context.fillStyle = '#fff';
+	_context.fillRect(_particles[i].getX(), _particles[i].getY(), 5, 5);
+}
+
+init();
