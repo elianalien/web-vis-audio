@@ -48,36 +48,41 @@ _image.onload = e => {
 	SP.onaudioprocess = render;
 }
 
+// rendering each frame
 render = e => {
-	console.log('render')
 	// audio Data
 	audioData = e.outputBuffer.getChannelData(0);
+	
 	// print timer on browser's title 
 	time += audioData.length / AC.sampleRate;
 	document.title = time;
 
-
+	// add particle if size < max particle
 	if (_particles.length < MAX_PARTICLES){
 		var part = new Particle();
 		_particles.push(part);
 	}
 
+	// clear canvas per frame
 	_context.clearRect(0, 0, _canvasWidth, _canvasHeight);
+	
+	// redraw image
 	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
 	
+	// check and updates each time
 	for (var i = 0; i < _particles.length; i++) {
+		// update per time
 		_particles[i].update();
 
+		// update opacity per frame based on update
 		_context.fillStyle = 'rgba(255, 255, 255, ' + _particles[i].getOpacity() + ')';
 		_context.fillRect(_particles[i].getX(), _particles[i].getY(), 3, 3);	
 
-		// destroy if in 
+		// destroy 
 		if (_particles[i].getLifespan()>MAX_LIFE_SPAN){
 			_particles.splice(i,1);
 		}
 	}
-
-
 }
 
 // init function 
@@ -143,9 +148,5 @@ function Particle() {
 	this.update = update;
 }
 
-drawParticle = () => {
-	_context.fillStyle = '#fff';
-	_context.fillRect(_particles[i].getX(), _particles[i].getY(), 5, 5);
-}
-
+// program run from here 
 init();
