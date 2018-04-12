@@ -85,7 +85,7 @@ render = f => {
 			vol = .1;
 			env = 1 - note % 2;
 			f = notesMelody.charAt(note % notesMelody.length) * 64;
-			signal += oscSawTooth(f) * env * vol;
+			signal += oscSquare(f) * env * vol;
 		}
 
 		// hihat
@@ -207,7 +207,7 @@ particleRoutine = () => {
 
 		// update opacity per frame based on update
 		_context.fillStyle = 'rgba(' + Math.random() * 255 + ',' 
-									 + Math.random() * 255 + ',' 
+									 +  255 + ',' 
 									 + Math.random() * 255 + ',' 
 									 + _particles[i].getOpacity() + ')';
 		_context.fillRect(_particles[i].getX(), _particles[i].getY(), 3, 3);	
