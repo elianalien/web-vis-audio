@@ -33,6 +33,17 @@ oscSquare =
 oscNoise = 
 	f => Math.random() * 2 -1;
 
+// noise
+noise = []
+newNoise = e => {
+	for (var i = 0; i < 8192; i++) {
+		noise[i] = Math.random() - .5;
+	}
+}
+
+newNoise()
+onclick = newNoise;
+
 
 // draw image 
 // callback to image onload
@@ -66,8 +77,6 @@ render = e => {
 	// clear canvas per frame
 	_context.clearRect(0, 0, _canvasWidth, _canvasHeight);
 	
-	// redraw image
-	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
 	
 	// check and updates each time
 	for (var i = 0; i < _particles.length; i++) {
@@ -75,7 +84,7 @@ render = e => {
 		_particles[i].update();
 
 		// update opacity per frame based on update
-		_context.fillStyle = 'rgba(255, 255, 255, ' + _particles[i].getOpacity() + ')';
+		_context.fillStyle = 'rgba(255, 255, 255,' + _particles[i].getOpacity() + ')';
 		_context.fillRect(_particles[i].getX(), _particles[i].getY(), 3, 3);	
 
 		// destroy 
@@ -83,6 +92,10 @@ render = e => {
 			_particles.splice(i,1);
 		}
 	}
+
+	// redraw image
+	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
+	
 }
 
 // init function 
@@ -129,8 +142,10 @@ function Particle() {
 		_direction = -1 + Math.random() * 10,
 		_posX = Math.random() * _canvasWidth,
 		_posY = Math.random() * _canvasHeight,
-		_lifespan = 0;
-		_opacity = 1;
+		_lifespan = 0,
+		_opacity = 0.5,
+		_pvx,
+		_pvy;
 
 	update = () => {
 		_lifespan++;
@@ -139,6 +154,15 @@ function Particle() {
 			_opacity = 1 - _lifespan / MAX_LIFE_SPAN;
 		
 		}
+
+		var _posX2 = Math.random() * _canvasWidth
+		var _posY2 = Math.random() * _canvasHeight
+
+		// x = A + t * (B - A)
+		_posX = _posX + (Math.random() * .005) * (_posX2 - _posX)
+		_posY = _posY + (Math.random() * .005) * (_posY2 - _posY)
+		
+
 	}
 
 	this.getOpacity = function() { return _opacity;};
