@@ -2,14 +2,13 @@
 notesBass   = '10143013202140205013101440202021';
 notesMelody = '11143313222144225513111444222221';
 
-// time init 
-time = 0;
 
 // all vars
-var MAX_PARTICLES = 1000,
-	MAX_LIFE_SPAN = 300,
+var MAX_PARTICLES = 500,
+	MAX_LIFE_SPAN = 100,
 	MIN_DENSITY = 15,
 	OFFSET_DENSITY= 15,
+	_time = 0,
 	_context,
 	_image,
 	_mouseX,
@@ -22,13 +21,13 @@ var MAX_PARTICLES = 1000,
 
 // basic oscillator 
 oscSinus = 
-	f => Math.sin(f * time * Math.PI * 2);
+	f => Math.sin(f * _time * Math.PI * 2);
 
 oscSawTooth =
-	f => (f * time * 2 + 1 ) % 2 - 1;
+	f => (f * _time * 2 + 1 ) % 2 - 1;
 
 oscSquare = 
-	f => 1 - (f * time * 2 & 1) * 2;
+	f => 1 - (f * _time * 2 & 1) * 2;
 
 oscNoise = 
 	f => Math.random() * 2 -1;
@@ -53,24 +52,63 @@ _image.onload = e => {
 	// init Audio Context when Image loaded
 	AC = new AudioContext();
 	// script processor
-	SP = AC.createScriptProcessor(1024, 0, 1); // 1024 buffer = 1024 sample frame
+	SP = AC.createScriptProcessor(2048, 0, 1); // 1024 buffer = 1024 sample frame
 	SP.connect(AC.destination);
 
 	SP.onaudioprocess = render;
 }
 
 // rendering each frame
-render = e => {
+render = f => {
 	// audio Data
-	audioData = e.outputBuffer.getChannelData(0);
+	audioData = f.outputBuffer.getChannelData(0);
 	
-	// print timer on browser's title 
-	time += audioData.length / AC.sampleRate;
-	document.title = time;
+	var timeInc = 1 / AC.sampleRate
+
+	_time += audioData.length / AC.sampleRate;
+
+	// print _timer on browser's title 
+	document.title = _time;
+
+	for (var i = 0; i < audioData.length; i++){
+		_time += timeInc; 		// time in scnd
+		beat = _time * 2;	// 120 bpm
+		bar = beat / 4;
+		pattern = bar / 6;
+		note = beat * 4;
+		master = Math.min(1, pattern);
+
+		signal = 0;
+
+		// melody 
+		if (pattern > 1 ){
+			vol = .1;
+			env = 1 - note % 2;
+			f = notesMelody.charAt(note % notesMelody.length) * 64;
+			signal += oscSawTooth(f) * env * vol;
+		}
+
+		// hihat
+		vol = .1;
+		env = Math.pow(1 - beat % 1, 8);
+		signal += oscNoise() * vol * env;
+
+		// cymbal crash 
+		vol = .7;
+		env = Math.pow(pattern % 1, 4) * .1 + 
+			  Math.pow(1 - pattern % 1, 64);
+		signal += oscNoise() * vol * env;		
+
+		audioData[i] = signal * master;
+
+	}
 
 	// particle routine 
 	particleRoutine();
 
+	c.style.scale = 1 + Math.pow(env + audioData[17], 3);
+	// _context.setTransform(1,0,0,1,0,0);
+	// _context.globalAlpha = _mouseY * _mouseY;
 	// redraw image
 	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
 	
@@ -78,6 +116,7 @@ render = e => {
 
 // init function 
 init = f => {
+
 	console.log('init')
 	// init particle 
 	_particles = [];
@@ -161,9 +200,9 @@ particleRoutine = () => {
 	_context.clearRect(0, 0, _canvasWidth, _canvasHeight);
 	
 	
-	// check and updates each time
+	// check and updates each _time
 	for (var i = 0; i < _particles.length; i++) {
-		// update per time
+		// update per _time
 		_particles[i].update();
 
 		// update opacity per frame based on update
