@@ -1,6 +1,7 @@
 // basic NOTE
 notesBass   = '10143013202140205013101440202021';
 notesMelody = '11143313222144225513111444222221';
+notesMelody2 = '11143313222122225653111444222221';
 
 
 // all vars
@@ -84,7 +85,7 @@ render = f => {
 		if (pattern > 1 ){
 			vol = .1;
 			env = 1 - note % 2;
-			f = notesMelody.charAt(note % notesMelody.length) * 64;
+			f = notesMelody2.charAt(note % notesMelody2.length) * 64;
 			signal += oscSquare(f) * env * vol;
 		}
 
@@ -106,12 +107,13 @@ render = f => {
 	// particle routine 
 	particleRoutine();
 
-	c.style.scale = 1 + Math.pow(env + audioData[17], 3);
+	
 	// _context.setTransform(1,0,0,1,0,0);
 	// _context.globalAlpha = _mouseY * _mouseY;
+
 	// redraw image
 	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
-	
+	c.style.scale = 1 + Math.pow(env + audioData[17], 3);
 }
 
 // init function 
@@ -207,8 +209,8 @@ particleRoutine = () => {
 
 		// update opacity per frame based on update
 		_context.fillStyle = 'rgba(' + Math.random() * 255 + ',' 
-									 +  255 + ',' 
 									 + Math.random() * 255 + ',' 
+									 +  255 + ',' 
 									 + _particles[i].getOpacity() + ')';
 		_context.fillRect(_particles[i].getX(), _particles[i].getY(), 3, 3);	
 
