@@ -89,7 +89,7 @@ render = f => {
 			signal += oscSquare(f) * env * vol;
 		}
 
-		// hihat
+		// hi-hat 
 		vol = .1;
 		env = Math.pow(1 - beat % 1, 8);
 		signal += oscNoise() * vol * env;
