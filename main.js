@@ -68,30 +68,8 @@ render = e => {
 	time += audioData.length / AC.sampleRate;
 	document.title = time;
 
-	// add particle if size < max particle
-	if (_particles.length < MAX_PARTICLES){
-		var part = new Particle();
-		_particles.push(part);
-	}
-
-	// clear canvas per frame
-	_context.clearRect(0, 0, _canvasWidth, _canvasHeight);
-	
-	
-	// check and updates each time
-	for (var i = 0; i < _particles.length; i++) {
-		// update per time
-		_particles[i].update();
-
-		// update opacity per frame based on update
-		_context.fillStyle = 'rgba(255, 255, 255,' + _particles[i].getOpacity() + ')';
-		_context.fillRect(_particles[i].getX(), _particles[i].getY(), 3, 3);	
-
-		// destroy 
-		if (_particles[i].getLifespan()>MAX_LIFE_SPAN){
-			_particles.splice(i,1);
-		}
-	}
+	// particle routine 
+	particleRoutine();
 
 	// redraw image
 	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
@@ -170,6 +148,36 @@ function Particle() {
 	this.getY = function() { return _posY;};
 	this.getLifespan = function() { return _lifespan};
 	this.update = update;
+}
+
+particleRoutine = () => {
+	// add particle if size < max particle
+	if (_particles.length < MAX_PARTICLES){
+		var part = new Particle();
+		_particles.push(part);
+	}
+
+	// clear canvas per frame
+	_context.clearRect(0, 0, _canvasWidth, _canvasHeight);
+	
+	
+	// check and updates each time
+	for (var i = 0; i < _particles.length; i++) {
+		// update per time
+		_particles[i].update();
+
+		// update opacity per frame based on update
+		_context.fillStyle = 'rgba(' + Math.random() * 255 + ',' 
+									 + Math.random() * 255 + ',' 
+									 + Math.random() * 255 + ',' 
+									 + _particles[i].getOpacity() + ')';
+		_context.fillRect(_particles[i].getX(), _particles[i].getY(), 3, 3);	
+
+		// destroy 
+		if (_particles[i].getLifespan()>MAX_LIFE_SPAN){
+			_particles.splice(i,1);
+		}
+	}
 }
 
 // program run from here 
