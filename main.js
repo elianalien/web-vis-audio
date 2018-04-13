@@ -71,6 +71,7 @@ render = f => {
 	// print _timer on browser's title 
 	document.title = _time;
 
+	// all muzic goes here
 	for (var i = 0; i < audioData.length; i++){
 		_time += timeInc; 		// time in scnd
 		beat = _time * 2;	// 120 bpm
