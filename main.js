@@ -112,8 +112,10 @@ render = f => {
 	// _context.globalAlpha = _mouseY * _mouseY;
 
 	// redraw image
-	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 0);
-	c.style.scale = 1 + Math.pow(env + audioData[17], 3);
+	var scale = 1 + Math.pow(env + audioData[17], 2);
+	_context.drawImage(_image, _canvasWidth / 2 - _image.width / 2, 
+							   _canvasHeight / 2 - _image.height / 2, 
+							   _image.width * scale, _image.height * scale);
 }
 
 // init function 
@@ -212,6 +214,8 @@ particleRoutine = () => {
 									 + Math.random() * 255 + ',' 
 									 +  255 + ',' 
 									 + _particles[i].getOpacity() + ')';
+
+		// var scale = 5 + Math.pow(env + audioData[0], 3);
 		_context.fillRect(_particles[i].getX(), _particles[i].getY(), 3, 3);	
 
 		// destroy 
