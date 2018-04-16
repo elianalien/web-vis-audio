@@ -86,7 +86,8 @@ render = f => {
 		if (pattern > 1 ){
 			vol = .1;
 			env = 1 - note % 2;
-			f = notesMelody2.charAt(note % notesMelody2.length) * 64;
+			f = notesMelody.charAt(note  % notesMelody.length) * 64;
+			// f = notesMelody2.charAt(note % notesMelody2.length) * 64;
 			signal += oscSquare(f) * env * vol;
 		}
 
